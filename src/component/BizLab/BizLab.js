@@ -12,7 +12,7 @@ export default class BizLab extends Component {
   render() {
     return (
       <View style={styles.labContainer}>
-        <Text>BizLab</Text>
+        <FaceScan/>
       </View>
     );
   }
