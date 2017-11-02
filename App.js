@@ -1,12 +1,11 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
-  Platform,
   StyleSheet,
-  Text,
-  View
+  AsyncStorage
 } from 'react-native';
 
-import FaceScan from './src/component/BizLab/FaceScan';
+import Login from './src/component/Login/Login';
+import Main from './src/component/Main';
 
 export default class App extends Component {
   constructor(props) {
@@ -15,33 +14,38 @@ export default class App extends Component {
       isLogin: false
     };
   }
+
   componentWillMount() {
     try {
-      //const token = await AsyncStorage.getItem('loginToken');
-      /*this.setState({
-        isLogin: !!token
-      });*/
+      AsyncStorage.getItem('loginToken').then((data) => {
+        this.setState({
+          isLogin: !!data
+        });
+      });
     } catch (error) {
       // Error saving data
     }
   }
+
   handleLogin = () => {
     try {
-      //const token = await AsyncStorage.setItem('loginToken','test');
-      this.setState({
-        isLogin: !this.state.isLogin
+      AsyncStorage.setItem('loginToken', 'mockToken').then(() => {
+        this.setState({
+          isLogin: true
+        });
       });
     } catch (error) {
       // Error saving data
     }
   };
+
   render() {
     const {isLogin} = this.state;
-    return (
-      <View style={styles.container}>
-        <FaceScan/>
-      </View>
-    );
+    if (isLogin) {
+      return <Main/>
+    } else {
+      return <Login login={this.handleLogin}/>
+    }
   }
 }
 const styles = StyleSheet.create({

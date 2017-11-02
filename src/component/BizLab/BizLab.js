@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Animated} from 'react-native';
+import {StyleSheet, View, Animated, Text} from 'react-native';
 import FaceScan from './FaceScan';
 
 export default class BizLab extends Component {
@@ -12,7 +12,7 @@ export default class BizLab extends Component {
   render() {
     return (
       <View style={styles.labContainer}>
-        <FaceScan/>
+        <Text>BizLab</Text>
       </View>
     );
   }
