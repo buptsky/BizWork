@@ -24,9 +24,15 @@ export default class FaceScan extends Component {
     super(props);
     this.state = {
       translateValue: new Animated.ValueXY({x: 0, y: 0}), // 二维坐标
+      modalVisible: false, // 采集/检测识别成功弹窗
       startScan: false, // 采集/验证状态
-      status: 'scan' // 判断是采集还是验证
+      status: 'scan', // 判断是采集还是验证
+      userName: '' // 识别出的用户信息
     };
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   // 点击进行扫描
@@ -40,30 +46,26 @@ export default class FaceScan extends Component {
     // this.test = setTimeout(() => {
     //   this.setState({modalVisible: true});
     // }, 4000);
-    this.timer = setInterval(() => {
-      this.takePicture();
-    }, 2000);
+    // this.timer = setInterval(() => {
+    //   this.takePicture();
+    // }, 2000);
+    this.takePicture();
   }
   // 取消扫描
   cancelScan = () => {
     // 取消动画效果
-    this.startAnimate = false;
-    this.state.translateValue.setValue({x: 0, y: 0});
+    this.resetAnimation();
+    clearInterval(this.timer);
     this.setState({startScan: false});
   }
   // 扫描成功
-  successScan = () => {
-    this.startAnimate = false;
+  successScan = (userName) => {
+    this.resetAnimation();
+    clearInterval(this.timer);
     this.setState({
       startScan: false,
-      status: 'login'
-    });
-  }
-  // 识别成功
-  successVerify = () => {
-    this.startAnimate = false;
-    this.setState({
-      startScan: false
+      modalVisible: true,
+      userName: userName ? userName : ''
     });
   }
   // 扫描效果动画
@@ -78,6 +80,11 @@ export default class FaceScan extends Component {
     ).start(() => {
       this.startAnimate && this.startAnimation();
     });
+  }
+  // 终止动画
+  resetAnimation = () => {
+    this.startAnimate = false;
+    this.state.translateValue.setValue({x: 0, y: 0});
   }
 
   takePicture = () => {
@@ -98,28 +105,28 @@ export default class FaceScan extends Component {
           fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `data=${encodeURIComponent(res)}&id=test123`
+            body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
           }).then(res => res.json())
             .then(data => {
+              // 有返回再发下一次请求
               console.log(data);
               // 扫描判断条件，成功采集三次返回
-              if (status === 'scan' && data.status) {
+              if (this.state.status === 'scan' && data.status) {
                 this.successNum++;
                 if (this.successNum === 3) {
-                  clearInterval(this.timer);
-                  alert('scan success');
                   this.successScan();
-                } else if (status === 'login' && data.status) {
-                  // 得到最终验证结果
-                  clearInterval(this.timer);
-                  if (!data.username) { // 验证失败
-
-                  } else {
-                    alert('verify success');
-                    this.successVerify();
-                  }
+                  return;
+                }
+              } else if (this.state.status === 'login' && data.status) {
+                console.log('return');
+                // 得到最终验证结果
+                if (!data.username) { // 验证失败
+                } else {
+                  this.successScan(data.username);
+                  return;
                 }
               }
+              this.takePicture();
             }).catch(err => console.log(err));
           // 传送图片后删除
           RNFS.unlink(path).then(() => {
@@ -129,8 +136,16 @@ export default class FaceScan extends Component {
       }).catch(err => console.error(err));
   }
 
+  closeModal = () => {
+    this.setState({
+      modalVisible: false,
+      status: 'login'
+    });
+  }
+
   render() {
     const isStart = this.state.startScan;
+    const status = this.state.status;
     return (
       <View style={styles.scanContainer}>
         <Camera
@@ -158,10 +173,39 @@ export default class FaceScan extends Component {
             <TouchableOpacity onPress={isStart ? this.cancelScan :  this.startScan}>
               <Icon name={isStart ? 'hourglass' : 'camera-retro'} size={72} color="#1DBAF1"/>
             </TouchableOpacity>
-            <Text style={styles.scanText}>
-              {isStart ? '取消采集': '点击进行面部数据采集'}</Text>
+            {
+              status === 'login' ? (
+                <Text style={styles.scanText}>
+                  {isStart ? '取消验证' : '开始进行面部验证'}
+                </Text>
+              ) : (
+                <Text style={styles.scanText}>
+                  {isStart ? '取消采集' : '点击进行面部数据采集'}
+                </Text>
+              )
+            }
           </View>
         </Camera>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={this.state.modalVisible}
+          onRequestClose={() => {
+          }}
+        >
+          <View style={{flex: 5, justifyContent: 'center', alignItems: 'center'}}>
+            <Icon name="check-square-o" size={60} color="#1DBAF1"/>
+            <Text style={{color: '#1DBAF1', fontSize: 36}}>
+              {status === 'scan' ? '扫描成功' : '验证成功'}
+            </Text>
+            <TouchableHighlight onPress={this.closeModal}>
+              <Text tyle={{fontSize: 24, padding: 10}}>
+                {status === 'scan' ? '开始人脸检测' : `welcom ${this.state.userName}`}
+              </Text>
+            </TouchableHighlight>
+          </View>
+          <View style={{flex: 1}}></View>
+        </Modal>
       </View>
     );
   }
