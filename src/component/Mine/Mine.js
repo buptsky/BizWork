@@ -1,11 +1,18 @@
 import React, {Component} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, AsyncStorage, Button} from 'react-native';
 
 export default class Mine extends Component {
+  logout = () => {
+    AsyncStorage.clear();
+    //this.props.main.logout()
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text>Mine</Text>
+        <Button onPress={this.logout}
+                title='登出'
+                color='#039be5'/>
       </View>
     );
   }

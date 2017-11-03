@@ -44,9 +44,15 @@ export default class App extends Component {
       // Error saving data
     }
   };
+  logout = () => {
+    this.setState({
+      isLoaded: true,
+      isLogin: false
+    })
+  };
 
   render() {
-    const {isLoaded,isLogin} = this.state;
+    const {isLoaded, isLogin} = this.state;
     if (!isLoaded) {
       return (
         <View style={styles.container}>
@@ -61,7 +67,7 @@ export default class App extends Component {
               backgroundColor="#1DBAF1"
               barStyle="light-content"
             />
-            <Main/>
+            <Main logout={this.logout}/>
           </View>
         )
       } else {
