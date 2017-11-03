@@ -6,19 +6,22 @@ import {
 
 import Login from './src/component/Login/Login';
 import Main from './src/component/Main';
+import Loading from './common/loading/Loading';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoaded: false,
       isLogin: false
     };
   }
 
   componentWillMount() {
     try {
-      AsyncStorage.getItem('loginToken').then((data) => {
+      AsyncStorage.getItem('userToken').then((data) => {
         this.setState({
+          isLoaded: true,
           isLogin: !!data
         });
       });
@@ -27,10 +30,11 @@ export default class App extends Component {
     }
   }
 
-  handleLogin = () => {
+  successLogin = (userName) => {
     try {
-      AsyncStorage.setItem('loginToken', 'mockToken').then(() => {
+      AsyncStorage.setItem('userToken', userName).then(() => {
         this.setState({
+          isLoaded: true,
           isLogin: true
         });
       });
@@ -40,11 +44,19 @@ export default class App extends Component {
   };
 
   render() {
-    const {isLogin} = this.state;
-    if (isLogin) {
-      return <Main/>
+    const {isLoaded,isLogin} = this.state;
+    if (!isLoaded) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Loading/>
+        </View>
+      )
     } else {
-      return <Login login={this.handleLogin}/>
+      if (isLogin) {
+        return <Main/>
+      } else {
+        return <Login successLogin={this.successLogin}/>
+      }
     }
   }
 }
