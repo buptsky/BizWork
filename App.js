@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import {
   View,
   StyleSheet,
-  AsyncStorage,
-  StatusBar
+  AsyncStorage
 } from 'react-native';
 
 import Login from './src/component/Login/Login';
@@ -61,15 +60,7 @@ export default class App extends Component {
       )
     } else {
       if (isLogin) {
-        return (
-          <View style={{flex: 1}}>
-            <StatusBar
-              backgroundColor="#1DBAF1"
-              barStyle="light-content"
-            />
-            <Main logout={this.logout}/>
-          </View>
-        )
+        return <Main logout={this.logout}/>
       } else {
         return <Login successLogin={this.successLogin}/>
       }
