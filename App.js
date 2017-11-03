@@ -27,7 +27,7 @@ export default class App extends Component {
         });
       });
     } catch (error) {
-      // Error saving data
+      alert(error);
     }
   }
 
@@ -60,7 +60,7 @@ export default class App extends Component {
       )
     } else {
       if (isLogin) {
-        return <Main logout={this.logout}/>
+        return <Main screenProps={this.logout}/>
       } else {
         return <Login successLogin={this.successLogin}/>
       }
