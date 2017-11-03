@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Animated, Text, Button, TouchableWithoutFeedback} from 'react-native';
+import {StyleSheet, View, Animated, Text, Button, TouchableWithoutFeedback, Platform} from 'react-native';
 import FaceScan from './FaceScan';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
@@ -49,7 +49,8 @@ export default class BizLab extends Component {
 const styles = StyleSheet.create({
   labContainer: {
     flex: 1,
-    padding: 10
+    padding: 10,
+    paddingTop: Platform.OS === 'ios' ? 30 : 15
   },
   labItemView: {
     height: 100,

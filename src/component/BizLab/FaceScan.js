@@ -34,7 +34,7 @@ export default class FaceScan extends Component {
   componentWillUnmount() {
     console.log('unmount');
   }
-  
+
   // 点击进行扫描
   startScan = () => {
     console.log('start scan');
@@ -100,40 +100,66 @@ export default class FaceScan extends Component {
             'http://10.129.148.81:8585/verifyFace.do' :
             'http://10.129.148.81:8585/addFace.do';
           // 发送请求
-          fetch(url, {
-            method: 'POST',
-            // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            // body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
-            body: JSON.stringify({
+          fetchData(url, {
               data: encodeURIComponent(res),
               id: 123123
-            })
-          }).then(res => res.json())
-            .then(data => {
-              // 有返回再发下一次请求
-              console.log(data);
-              // 扫描判断条件，成功采集三次返回
-              if (this.state.status === 'scan' && data.status) {
-                this.successNum++;
-                if (this.successNum === 3) {
-                  this.successScan();
-                  return;
-                }
-              } else if (this.state.status === 'login' && data.status) {
-                console.log('return');
-                // 得到最终验证结果
-                if (!data.username) { // 验证失败
-                } else {
-                  this.successScan(data.username);
-                  return;
-                }
+            }
+          ).then(data => {
+            // 有返回再发下一次请求
+            console.log(data);
+            // 扫描判断条件，成功采集三次返回
+            if (this.state.status === 'scan' && data.status) {
+              this.successNum++;
+              if (this.successNum === 3) {
+                this.successScan();
+                return;
               }
-              this.takePicture();
-            }).catch(err => console.log(err));
+            } else if (this.state.status === 'login' && data.status) {
+              console.log('return');
+              // 得到最终验证结果
+              if (!data.username) { // 验证失败
+              } else {
+                this.successScan(data.username);
+                return;
+              }
+            }
+            this.takePicture();
+          }).catch(err => console.log(err));
+          // 发送请求
+          // fetch(url, {
+          //   method: 'POST',
+          //   // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          //   headers: {
+          //     'Accept': 'application/json',
+          //     'Content-Type': 'application/json',
+          //   },
+          //   // body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
+          //   body: JSON.stringify({
+          //     data: encodeURIComponent(res),
+          //     id: 123123
+          //   })
+          // }).then(res => res.json())
+          //   .then(data => {
+          //     // 有返回再发下一次请求
+          //     console.log(data);
+          //     // 扫描判断条件，成功采集三次返回
+          //     if (this.state.status === 'scan' && data.status) {
+          //       this.successNum++;
+          //       if (this.successNum === 3) {
+          //         this.successScan();
+          //         return;
+          //       }
+          //     } else if (this.state.status === 'login' && data.status) {
+          //       console.log('return');
+          //       // 得到最终验证结果
+          //       if (!data.username) { // 验证失败
+          //       } else {
+          //         this.successScan(data.username);
+          //         return;
+          //       }
+          //     }
+          //     this.takePicture();
+          //   }).catch(err => console.log(err));
           // 传送图片后删除
           RNFS.unlink(path).then(() => {
             console.log('FILE DELETED');
@@ -177,7 +203,7 @@ export default class FaceScan extends Component {
             </Animated.View>
           </View>
           <View style={styles.operateView}>
-            <TouchableOpacity onPress={isStart ? this.cancelScan :  this.startScan}>
+            <TouchableOpacity onPress={isStart ? this.cancelScan : this.startScan}>
               <Icon name={isStart ? 'hourglass' : 'camera-retro'} size={72} color="#1DBAF1"/>
             </TouchableOpacity>
             {
