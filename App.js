@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import {
   View,
   StyleSheet,
-  AsyncStorage
+  AsyncStorage,
+  StatusBar
 } from 'react-native';
 
 import Login from './src/component/Login/Login';
 import Main from './src/component/Main';
-import Loading from './src/common/loading/Loading';
+import Loading from './src/common/Loading/Loading';
 
 export default class App extends Component {
   constructor(props) {
@@ -48,13 +49,21 @@ export default class App extends Component {
     const {isLoaded,isLogin} = this.state;
     if (!isLoaded) {
       return (
-        <View style={styles.loadingContainer}>
+        <View style={styles.container}>
           <Loading/>
         </View>
       )
     } else {
       if (isLogin) {
-        return <Main/>
+        return (
+          <View style={{flex: 1}}>
+            <StatusBar
+              backgroundColor="#1DBAF1"
+              barStyle="light-content"
+            />
+            <Main/>
+          </View>
+        )
       } else {
         return <Login successLogin={this.successLogin}/>
       }

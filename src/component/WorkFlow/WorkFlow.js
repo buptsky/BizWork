@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, StyleSheet, ListView} from 'react-native';
-import Loading from '../../common/loading/Loading';
+import Loading from '../../common/Loading/Loading';
 import WorkFlowItem from './WorkFlowItem';
 
 export default class WorkFlow extends Component {

@@ -15,6 +15,7 @@ import {
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import fetchData from '../../util/util';
 import Screen from '../../common/screen';
 
 
