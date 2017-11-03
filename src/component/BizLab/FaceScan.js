@@ -54,13 +54,11 @@ export default class FaceScan extends Component {
   cancelScan = () => {
     // 取消动画效果
     this.resetAnimation();
-    // clearInterval(this.timer);
     this.setState({startScan: false});
   }
   // 扫描成功
   successScan = (userName) => {
     this.resetAnimation();
-    // clearInterval(this.timer);
     this.setState({
       startScan: false,
       modalVisible: true,
@@ -103,8 +101,16 @@ export default class FaceScan extends Component {
           // 发送请求
           fetch(url, {
             method: 'POST',
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `data=${encodeURIComponent(res)}&id=test123`
+            // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            // body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
+            body: JSON.stringify({
+              data: encodeURIComponent(res),
+              id: 123123
+            })
           }).then(res => res.json())
             .then(data => {
               // 有返回再发下一次请求
