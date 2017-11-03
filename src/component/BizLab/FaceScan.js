@@ -19,7 +19,6 @@ import Screen from '../../common/screen';
 
 
 export default class FaceScan extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -32,9 +31,9 @@ export default class FaceScan extends Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.timer);
+    console.log('unmount');
   }
-
+  
   // 点击进行扫描
   startScan = () => {
     console.log('start scan');
@@ -55,13 +54,13 @@ export default class FaceScan extends Component {
   cancelScan = () => {
     // 取消动画效果
     this.resetAnimation();
-    clearInterval(this.timer);
+    // clearInterval(this.timer);
     this.setState({startScan: false});
   }
   // 扫描成功
   successScan = (userName) => {
     this.resetAnimation();
-    clearInterval(this.timer);
+    // clearInterval(this.timer);
     this.setState({
       startScan: false,
       modalVisible: true,
@@ -105,7 +104,7 @@ export default class FaceScan extends Component {
           fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
+            body: `data=${encodeURIComponent(res)}&id=test123`
           }).then(res => res.json())
             .then(data => {
               // 有返回再发下一次请求
@@ -156,6 +155,7 @@ export default class FaceScan extends Component {
           style={styles.cameraView}
           aspect={Camera.constants.Aspect.fill}
           playSoundOnCapture={false}
+          captureQuality={'photo'}
           captureTarget={Camera.constants.CaptureTarget.disk}
         >
           <View style={styles.scanView}>
@@ -226,10 +226,12 @@ const styles = StyleSheet.create({
   operateView: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: 'transparent'
   },
   scanText: {
     fontSize: 20,
-    color: "#1DBAF1"
+    color: "#1DBAF1",
+    backgroundColor: 'transparent'
   }
 });
