@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {
+  View,
   StyleSheet,
   AsyncStorage
 } from 'react-native';
 
 import Login from './src/component/Login/Login';
 import Main from './src/component/Main';
-import Loading from './common/loading/Loading';
+import Loading from './src/common/loading/Loading';
 
 export default class App extends Component {
   constructor(props) {

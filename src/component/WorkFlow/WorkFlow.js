@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {View, StyleSheet} from 'react-native';
-import Loading from '../common/loading/Loading'
+import {View, StyleSheet, ListView} from 'react-native';
+import Loading from '../../common/loading/Loading';
+import WorkFlowItem from './WorkFlowItem';
 
 export default class WorkFlow extends Component {
   constructor(props) {
@@ -10,10 +11,10 @@ export default class WorkFlow extends Component {
       rowHasChanged: (r1, r2) => r1 !== r2
     });
 
-    const MockList = ['待办事项1','待办事项2','待办事项3'];
+    const MockList = ['待办事项1', '待办事项2', '待办事项3'];
 
     this.state = {
-      isLoading: true,
+      isLoading: false,
       dataSource: this.ds.cloneWithRows(MockList),
     };
 
