@@ -18,12 +18,12 @@ export default fetchData = (options) => {
         body: JSON.stringify(options.data)
       };
 
-      fetch(options.url, fetchOption).then((response)=>{
-        if(response.success) {
-          resolve(response.data);
+      fetch(options.url, fetchOption).then(response=>response.json()).then((responseJSON)=>{
+        if(responseJSON.success) {
+          resolve(responseJSON.data);
         } else {
-          BizWorkAlert(response);
-          reject(response);
+          BizWorkAlert(responseJSON.errorMsg);
+          reject(responseJSON);
         }
       })
     })
