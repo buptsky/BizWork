@@ -15,7 +15,7 @@ import {
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import fetchData from '../../util/util';
+import fetchData from '../../util/fetchData';
 import Screen from '../../common/screen';
 
 
@@ -59,6 +59,7 @@ export default class FaceScan extends Component {
     // this.timer = setInterval(() => {
     //   this.takePicture();
     // }, 2000);
+    // this.takePicture();
     this.takePicture();
   }
   // 取消扫描
@@ -73,7 +74,8 @@ export default class FaceScan extends Component {
     this.setState({
       startScan: false,
       modalVisible: true,
-      userName: userName ? userName : ''
+      userName: userName ? userName : '',
+      tip: '正在扫描，请耐心等待...'
     });
   }
   // 扫描效果动画
@@ -95,93 +97,44 @@ export default class FaceScan extends Component {
     this.state.translateValue.setValue({x: 0, y: 0});
   }
 
-  takePicture = () => {
-    console.log('once');
+  // 面部扫描
+  async takePicture () {
     const status = this.state.status;
     const options = {};
-    this.camera.capture({metadata: options})
-      .then((data) => {
-        // 处理系统兼容
-        // substring(7) -> to remove the file://
-        let path = Platform.OS === 'android' ? data.path.substring(7) : data.path;
-        RNFS.readFile(path, "base64").then(res => {
-          // console.log(res);
-          const url = status === 'login' ?
-            'http://10.129.148.81:8585/verifyFace.do' :
-            'http://10.129.148.81:8585/addFace.do';
-          // 发送请求
-          fetchData({
-            url: url,
-            data: {
-              data: encodeURIComponent(res)
-            }
-          }).then(data => {
-            // 有返回再发下一次请求
-            console.log(111111);
-            console.log(data);
-            // 扫描判断条件，成功采集三次返回
-            if (this.state.status === 'scan' && data.status) {
-              console.log('scan');
-              this.successNum++;
-              if (this.successNum === 3) {
-                this.successScan();
-                return;
-              }
-            } else if (this.state.status === 'login' && data.status) {
-              console.log('return');
-              // 得到最终验证结果
-              if (!data.username) { // 验证失败
-              } else {
-                this.successScan(data.username);
-                return;
-              }
-            }
-            console.log(1111111);
-            this.takePicture();
-          }).catch((err) => {
-            console.log(err);
-          });
-          // 发送请求
-          // fetch(url, {
-          //   method: 'POST',
-          //   // headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          //   headers: {
-          //     'Accept': 'application/json',
-          //     'Content-Type': 'application/json',
-          //   },
-          //   // body: `data=${encodeURIComponent(res)}&id=zhaiyibo`
-          //   body: JSON.stringify({
-          //     data: encodeURIComponent(res),
-          //     id: 123123
-          //   })
-          // }).then(res => res.json())
-          //   .then(data => {
-          //     // 有返回再发下一次请求
-          //     console.log(data);
-          //     // 扫描判断条件，成功采集三次返回
-          //     if (this.state.status === 'scan' && data.status) {
-          //       this.successNum++;
-          //       if (this.successNum === 3) {
-          //         this.successScan();
-          //         return;
-          //       }
-          //     } else if (this.state.status === 'login' && data.status) {
-          //       console.log('return');
-          //       // 得到最终验证结果
-          //       if (!data.username) { // 验证失败
-          //       } else {
-          //         this.successScan(data.username);
-          //         return;
-          //       }
-          //     }
-          //     this.takePicture();
-          //   }).catch(err => console.log(err));
-          // 传送图片后删除
-          RNFS.unlink(path).then(() => {
-            console.log('FILE DELETED');
-          }).catch(err => console.error(err));
-        }).catch(err => console.error(err));
-      }).catch(err => console.error(err));
+    try {
+      const captureData = await this.camera.capture({metadata: options});
+      // 获取可读取的路径，处理系统兼容
+      // substring(7) -> to remove the file://
+      let path = Platform.OS === 'android' ?
+        captureData.path.substring(7) : captureData.path;
+      const base64 = await RNFS.readFile(path, "base64"); // 读取转换为base64的数据
+      await RNFS.unlink(path); // 读取后删除文件
+      // 判断是采集还是验证
+      const url = status === 'login' ?
+        'http://10.129.148.81:8585/verifyFace.do' :
+        'http://10.129.148.81:8585/addFace.do';
+      const res = await fetchData({ // 发送数据请求
+        url: url, data: {data: encodeURIComponent(base64)}
+      });
+      if (this.state.status === 'scan' && res.status) { // 采集
+        console.log('success');
+        this.successNum++;
+        if (this.successNum === 3) {
+          this.successScan();
+          return;
+        }
+      } else if (this.state.status === 'login' && res.status) { // 验证
+        console.log('return login status!!!');
+        // 得到最终验证结果
+        if (res.username) { // 验证失败
+          this.successScan(res.username);
+          return;
+        }
+      }
+      this.takePicture(); // 继续采集信息
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   closeModal = () => {
@@ -217,6 +170,7 @@ export default class FaceScan extends Component {
               backgroundColor: '#1DBAF1'
             }}>
             </Animated.View>
+            {/*<Text style={{width: 200, color: '#1DBAF1', fontSize: 26}}>{this.state.tip}</Text>*/}
           </View>
           <View style={styles.operateView}>
             <TouchableOpacity onPress={isStart ? this.cancelScan : this.startScan}>
@@ -270,7 +224,8 @@ const styles = StyleSheet.create({
   },
   scanView: {
     flex: 3,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center'
   },
   operateView: {
     flex: 1,
