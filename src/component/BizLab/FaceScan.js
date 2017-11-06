@@ -15,7 +15,7 @@ import {
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import fetchData from '../../util/util';
+import fetchData from '../../util/fetchData';
 import Screen from '../../common/screen';
 
 
@@ -60,7 +60,7 @@ export default class FaceScan extends Component {
     //   this.takePicture();
     // }, 2000);
     // this.takePicture();
-    this.takePictureTest();
+    this.takePicture();
   }
   // 取消扫描
   cancelScan = () => {

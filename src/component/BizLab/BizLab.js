@@ -3,7 +3,7 @@ import {StyleSheet, View, Animated, Text, Button, TouchableWithoutFeedback, Plat
 import FaceScan from './FaceScan';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
-import fetchData from '../../util/util';
+import fetchData from '../../util/fetchData';
 
 export default class BizLab extends Component {
 

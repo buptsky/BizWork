@@ -25,7 +25,7 @@ export default fetchData = (options) => {
           // BizWorkAlert(responseJSON.errorMsg);
           reject(responseJSON);
         }
-      })
-    })
+      });
+    });
   });
 };
