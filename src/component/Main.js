@@ -13,7 +13,7 @@ const Tab = TabNavigator({
         tabBarLabel: '工作流程',
         tabBarIcon: ({tintColor, focused}) => (
           <Ionicons
-            name={focused ? 'ios-home' : 'ios-home-outline'}
+            name={focused ? 'ios-list' : 'ios-list-outline'}
             size={26}
             style={{color: tintColor}}
           />
