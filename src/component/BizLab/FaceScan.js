@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Platform
 } from 'react-native';
+import {Toast} from 'antd-mobile';
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -20,19 +21,40 @@ import Screen from '../../common/screen';
 
 
 export default class FaceScan extends Component {
+
+  static navigationOptions = ({navigation}) => {
+    const {state, setParams} = navigation;
+    return {
+      headerRight: <Icon
+        name="camera"
+        size={20}
+        color="#fff"
+        style={{marginRight: 20}}
+        onPress={() => {
+          setParams({direction: state.params.direction === 'back' ? 'front' : 'back'})
+        }}
+      />
+    }
+  };
+
   constructor(props) {
     super(props);
     this.state = {
+      cameraDirection: 'front',
       translateValue: new Animated.ValueXY({x: 0, y: 0}), // 二维坐标
       modalVisible: false, // 采集/检测识别成功弹窗
       startScan: false, // 采集/验证状态
       status: 'scan', // 判断是采集还是验证
-      userName: '' // 识别出的用户信息
+      userName: '', // 识别出的用户信息
+      modalTip: false, // 提示modal
+      modalContent: '验证失败，请确认是否已经完成录入，或稍后再试',
+      tip: ''
     };
   }
 
   componentWillMount() {
-    const { params } = this.props.navigation.state;
+    const {params} = this.props.navigation.state;
+    this.props.navigation.setParams({direction: 'front'});
     if (params.isCollect) {
       this.setState({
         status: 'login'
@@ -49,9 +71,12 @@ export default class FaceScan extends Component {
     console.log('start scan');
     this.startAnimate = true;
     this.startAnimation(); // 开启动画效果
-    this.setState({startScan: true});
+    this.setState({
+      startScan: true,
+      tip: this.state.status === 'login' ? '正在验证，请稍后...' : '正在采集中，成功次数(0/3)...'
+    });
     this.successNum = 0; // 用于记录采集合格数量
-    this.failNum = 5;
+    this.failNum = 0; // 设定失败次数限制
     // 测试程序，假设一段时间后自动成功
     // this.test = setTimeout(() => {
     //   this.setState({modalVisible: true});
@@ -66,7 +91,10 @@ export default class FaceScan extends Component {
   cancelScan = () => {
     // 取消动画效果
     this.resetAnimation();
-    this.setState({startScan: false});
+    this.setState({
+      startScan: false,
+      tip: ''
+    });
   }
   // 扫描成功
   successScan = (userName) => {
@@ -75,7 +103,7 @@ export default class FaceScan extends Component {
       startScan: false,
       modalVisible: true,
       userName: userName ? userName : '',
-      tip: '正在扫描，请耐心等待...'
+      tip: ''
     });
   }
   // 扫描效果动画
@@ -98,7 +126,7 @@ export default class FaceScan extends Component {
   }
 
   // 面部扫描
-  async takePicture () {
+  async takePicture() {
     const status = this.state.status;
     const options = {};
     try {
@@ -117,22 +145,35 @@ export default class FaceScan extends Component {
         url: url, data: {data: encodeURIComponent(base64)}
       });
       if (this.state.status === 'scan' && res.status) { // 采集
-        console.log('success');
         this.successNum++;
+        console.log('success');
+        this.setState({
+          tip: this.state.tip.replace(/\((\d+)\//, `(${this.successNum}/`)
+        });
         if (this.successNum === 3) {
           this.successScan();
           return;
         }
-      } else if (this.state.status === 'login' && res.status) { // 验证
-        console.log('return login status!!!');
-        // 得到最终验证结果
-        if (res.username) { // 验证失败
+      } else if (this.state.status === 'login') { // 验证
+        if (res.status) { // 验证成功
           this.successScan(res.username);
           return;
+        } else { // 验证失败次数记录
+          this.failNum++;
+          console.log(this.failNum);
+          if (this.failNum === 5) { // 判定检测失败
+            this.scanFail();
+            return;
+          }
         }
+        console.log('return login status!!!');
+        // 得到最终验证结果
       }
-      this.takePicture(); // 继续采集信息
+      if (this.state.startScan) { // 取消扫描时不操作
+        this.takePicture(); // 继续采集信息
+      }
     } catch (err) {
+      Toast.info('网络错误，请稍后再试');
       console.log(err);
     }
   }
@@ -143,17 +184,28 @@ export default class FaceScan extends Component {
       status: 'login'
     });
   }
+  // 关闭提示modal
+  closeTip = () => {
+    this.setState({modalTip: false});
+  }
+  // 验证失败
+  scanFail = () => {
+    this.failNum = 0;
+    this.setState({modalTip: true});
+    this.cancelScan();
+  }
 
   render() {
     const isStart = this.state.startScan;
     const status = this.state.status;
+    const direction = this.props.navigation.state.params.direction;
     return (
       <View style={styles.scanContainer}>
         <Camera
           ref={(cam) => {
             this.camera = cam;
           }}
-          type={'front'}
+          type={direction || 'front'}
           style={styles.cameraView}
           aspect={Camera.constants.Aspect.fill}
           playSoundOnCapture={false}
@@ -162,7 +214,6 @@ export default class FaceScan extends Component {
         >
           <View style={styles.scanView}>
             <Animated.View style={{
-              flex: 1,
               height: 1,
               transform: [
                 {translateY: this.state.translateValue.y} // y轴移动
@@ -170,7 +221,11 @@ export default class FaceScan extends Component {
               backgroundColor: '#1DBAF1'
             }}>
             </Animated.View>
-            {/*<Text style={{width: 200, color: '#1DBAF1', fontSize: 26}}>{this.state.tip}</Text>*/}
+            <View style={styles.tipView}>
+              <Text style={styles.tipText}>
+                {this.state.tip}
+              </Text>
+            </View>
           </View>
           <View style={styles.operateView}>
             <TouchableOpacity onPress={isStart ? this.cancelScan : this.startScan}>
@@ -196,18 +251,57 @@ export default class FaceScan extends Component {
           onRequestClose={() => {
           }}
         >
-          <View style={{flex: 5, justifyContent: 'center', alignItems: 'center'}}>
-            <Icon name="check-square-o" size={60} color="#1DBAF1"/>
-            <Text style={{color: '#1DBAF1', fontSize: 36}}>
-              {status === 'scan' ? '扫描成功' : '验证成功'}
-            </Text>
-            <TouchableHighlight onPress={this.closeModal}>
-              <Text tyle={{fontSize: 24, padding: 10}}>
-                {status === 'scan' ? '开始人脸检测' : `welcom ${this.state.userName}`}
+          <TouchableWithoutFeedback onPress={this.closeModal}>
+            <View style={{flex: 1}}>
+              <View style={{flex: 5, justifyContent: 'center', alignItems: 'center'}}>
+                <Icon name="check-square-o" size={60} color="#1DBAF1"/>
+                <Text style={{color: '#1DBAF1', fontSize: 36}}>
+                  {status === 'scan' ? '扫描成功' : '验证成功'}
+                </Text>
+                <Text style={{fontSize: 26, padding: 10}}>
+                  {status === 'scan' ? '开始人脸检测' : `${this.state.userName}`}
+                </Text>
+              </View>
+              <View style={{flex: 1}}></View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={this.state.modalTip}
+          onRequestClose={() => {
+          }}
+        >
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}>
+            <View style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+              borderRadius: 10,
+              marginLeft: 20,
+              marginRight: 20,
+              padding: 15
+            }}>
+              <Text style={{fontSize: 18, color: '#333'}}>
+                {this.state.modalContent}
               </Text>
-            </TouchableHighlight>
+              <TouchableWithoutFeedback onPress={this.closeTip}>
+                <View>
+                  <Text style={{
+                    fontSize: 24,
+                    color: '#1DBAF1',
+                    marginTop: 10
+                  }}>好的</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
-          <View style={{flex: 1}}></View>
         </Modal>
       </View>
     );
@@ -224,8 +318,15 @@ const styles = StyleSheet.create({
   },
   scanView: {
     flex: 3,
-    flexDirection: 'row',
-    justifyContent: 'center'
+  },
+  tipView: {
+    height: 20,
+    alignItems: 'center'
+  },
+  tipText: {
+    marginTop: 20,
+    color: '#1DBAF1',
+    fontSize: 20
   },
   operateView: {
     flex: 1,
@@ -235,7 +336,7 @@ const styles = StyleSheet.create({
   },
   scanText: {
     fontSize: 20,
-    color: "#1DBAF1",
+    color: '#1DBAF1',
     backgroundColor: 'transparent'
   }
 });
