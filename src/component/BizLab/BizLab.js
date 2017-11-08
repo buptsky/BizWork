@@ -33,8 +33,7 @@ export default class BizLab extends Component {
     try {
       const res =  await fetchData({
         url: '/queryUser.do',
-        data: {},
-        needDefaultServer: true
+        data: {}
       });
       if (res.status) {
         await AsyncStorage.setItem('status', 'login');
