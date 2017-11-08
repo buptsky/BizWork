@@ -4,7 +4,7 @@ import {
   StyleSheet,
   AsyncStorage
 } from 'react-native';
-
+import fetchData from './src/util/fetchData';
 import Login from './src/component/Login/Login';
 import Main from './src/component/Main';
 import Loading from './src/common/Loading/Loading';
@@ -25,6 +25,9 @@ export default class App extends Component {
           isLoaded: true,
           isLogin: !!data
         });
+      });
+      fetchData({url: '/tst.do', data: {}}).then((data) => {
+        console.log(data);
       });
     } catch (error) {
       alert(error);
