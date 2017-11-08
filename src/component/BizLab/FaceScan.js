@@ -10,12 +10,14 @@ import {
   Animated,
   Easing,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
+  AsyncStorage
 } from 'react-native';
 import {Toast} from 'antd-mobile';
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import fetchData from '../../util/fetchData';
 import Screen from '../../common/screen';
 
@@ -25,9 +27,9 @@ export default class FaceScan extends Component {
   static navigationOptions = ({navigation}) => {
     const {state, setParams} = navigation;
     return {
-      headerRight: <Icon
-        name="camera"
-        size={20}
+      headerRight: <Ionicons
+        name="ios-reverse-camera"
+        size={36}
         color="#fff"
         style={{marginRight: 20}}
         onPress={() => {
@@ -44,7 +46,7 @@ export default class FaceScan extends Component {
       translateValue: new Animated.ValueXY({x: 0, y: 0}), // 二维坐标
       modalVisible: false, // 采集/检测识别成功弹窗
       startScan: false, // 采集/验证状态
-      status: 'scan', // 判断是采集还是验证
+      status: '', // 判断是采集还是验证
       userName: '', // 识别出的用户信息
       modalTip: false, // 提示modal
       modalContent: '验证失败，请确认是否已经完成录入，或稍后再试',
@@ -53,17 +55,17 @@ export default class FaceScan extends Component {
   }
 
   componentWillMount() {
-    const {params} = this.props.navigation.state;
-    this.props.navigation.setParams({direction: 'front'});
-    if (params.isCollect) {
+    AsyncStorage.getItem('status').then((data) => {
+      console.log(data);
       this.setState({
-        status: 'login'
+        status: data
       });
-    }
+    });
+    this.props.navigation.setParams({direction: 'front'});
   }
 
   componentWillUnmount() {
-    console.log('unmount');
+    // console.log('unmount');
   }
 
   // 点击进行扫描
@@ -139,10 +141,10 @@ export default class FaceScan extends Component {
       await RNFS.unlink(path); // 读取后删除文件
       // 判断是采集还是验证
       const url = status === 'login' ?
-        'http://10.129.148.81:8585/verifyFace.do' :
-        'http://10.129.148.81:8585/addFace.do';
+        '/verifyFace.do' :
+        '/addFace.do';
       const res = await fetchData({ // 发送数据请求
-        url: url, data: {data: encodeURIComponent(base64)}
+        url: url, data: {data: encodeURIComponent(base64)},needDefaultServer: true
       });
       if (this.state.status === 'scan' && res.status) { // 采集
         this.successNum++;
@@ -179,9 +181,11 @@ export default class FaceScan extends Component {
   }
 
   closeModal = () => {
-    this.setState({
-      modalVisible: false,
-      status: 'login'
+    AsyncStorage.setItem('status', 'login').then(() => {
+      this.setState({
+        modalVisible: false,
+        status: 'login'
+      });
     });
   }
   // 关闭提示modal
@@ -198,7 +202,10 @@ export default class FaceScan extends Component {
   render() {
     const isStart = this.state.startScan;
     const status = this.state.status;
-    const direction = this.props.navigation.state.params.direction;
+    let direction = '';
+    if (this.props.navigation.state.params) {
+      direction = this.props.navigation.state.params.direction;
+    }
     return (
       <View style={styles.scanContainer}>
         <Camera
@@ -326,7 +333,8 @@ const styles = StyleSheet.create({
   tipText: {
     marginTop: 20,
     color: '#1DBAF1',
-    fontSize: 20
+    fontSize: 20,
+    backgroundColor: 'transparent'
   },
   operateView: {
     flex: 1,
