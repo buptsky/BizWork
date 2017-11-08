@@ -8,7 +8,7 @@ export default fetchData = (options) => {
       if (!error && token) {
         options.data.id = token;
       }
-      if (options.needDefaultServer) {
+      if (options.needDefaultServer || options.needDefaultServer === undefined) {
         options.url = 'http://10.129.148.81:8585' + options.url;
       }
       const fetchOption = {

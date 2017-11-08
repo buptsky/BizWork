@@ -144,7 +144,7 @@ export default class FaceScan extends Component {
         '/verifyFace.do' :
         '/addFace.do';
       const res = await fetchData({ // 发送数据请求
-        url: url, data: {data: encodeURIComponent(base64)},needDefaultServer: true
+        url: url, data: {data: encodeURIComponent(base64)}
       });
       if (this.state.status === 'scan' && res.status) { // 采集
         this.successNum++;
