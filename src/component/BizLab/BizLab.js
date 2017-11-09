@@ -14,7 +14,7 @@ import FaceScan from './FaceScan';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import fetchData from '../../util/fetchData';
-import Camera from 'react-native-camera';
+import servers from '../../util/servers';
 
 export default class BizLab extends Component {
 
@@ -31,10 +31,9 @@ export default class BizLab extends Component {
 
   // 判断是否采集过数据
   async componentWillMount() {
-    console.log('will mount');
     try {
       const res = await fetchData({
-        url: '/queryUser.do',
+        url: servers.FaceScan + '/queryUser.do',
         data: {}
       });
       if (res.status) {
