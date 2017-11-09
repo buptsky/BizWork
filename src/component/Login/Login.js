@@ -33,7 +33,6 @@ export default class FaceScan extends Component {
     return (
       <Image source={require('./bg.jpg')} style={styles.backgroundImage} >
         <View style={styles.container}>
-
           <View style={styles.logoview}>
             <Image source={require('./logo.png')} style={styles.avatarimage}/>
           </View>
