@@ -14,13 +14,14 @@ import FaceScan from './FaceScan';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import fetchData from '../../util/fetchData';
+import Camera from 'react-native-camera';
 
 export default class BizLab extends Component {
 
   static navigationOptions = ({navigation}) => {
     const {state, setParams} = navigation;
   };
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -30,8 +31,9 @@ export default class BizLab extends Component {
 
   // 判断是否采集过数据
   async componentWillMount() {
+    console.log('will mount');
     try {
-      const res =  await fetchData({
+      const res = await fetchData({
         url: '/queryUser.do',
         data: {}
       });
@@ -44,19 +46,21 @@ export default class BizLab extends Component {
       this.setState({
         loading: false
       });
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     }
+  }
+
+  componentDidMount() {
+    console.log('did');
   }
 
   componentWillUnmount() {
     console.log('unmount');
   }
-  
+
   render() {
-    console.log(this.props.navigation.state.params);;
     const {navigate} = this.props.navigation;
-    console.log(navigate);
     return (
       <View style={styles.labContainer}>
         {
@@ -123,3 +127,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   }
 });
+

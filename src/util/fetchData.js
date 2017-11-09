@@ -9,7 +9,7 @@ export default fetchData = (options) => {
         options.data.id = token;
       }
       if (options.needDefaultServer || options.needDefaultServer === undefined) {
-        options.url = 'http://10.129.148.81:8585' + options.url;
+        options.url = 'http://10.142.82.212:9191' + options.url;
       }
       const fetchOption = {
         method: options.method || 'POST',
