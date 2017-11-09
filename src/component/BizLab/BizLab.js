@@ -14,7 +14,7 @@ import FaceScan from './FaceScan';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import fetchData from '../../util/fetchData';
-
+import  servers from '../../util/servers';
 export default class BizLab extends Component {
 
   static navigationOptions = ({navigation}) => {
@@ -32,7 +32,7 @@ export default class BizLab extends Component {
   async componentWillMount() {
     try {
       const res =  await fetchData({
-        url: '/queryUser.do',
+        url: servers.FaceScan + '/queryUser.do',
         data: {}
       });
       if (res.status) {
