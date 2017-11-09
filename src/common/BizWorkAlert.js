@@ -7,7 +7,7 @@ import {
 let BizWorkAlert = Alert;
 
 if (Platform.OS === 'ios') {
-  EMONAlert = AlertIOS
+  BizWorkAlert = AlertIOS
 }
 
 export default BizWorkAlert

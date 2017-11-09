@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
+import BizWorkAlert from '../../common/BizWorkAlert';
 import {
   StyleSheet,
   Text,
   Image,
+  ImageBackground,
   View,
   TextInput,
   TouchableOpacity,
@@ -10,7 +12,7 @@ import {
   Dimensions
 } from 'react-native';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import { Hideo } from 'react-native-textinput-effects';
+import {Hideo} from 'react-native-textinput-effects';
 
 export default class FaceScan extends Component {
   constructor(props) {
@@ -23,15 +25,20 @@ export default class FaceScan extends Component {
 
   confirmLogin = () => {
     const {userName, passWord} = this.state;
-    if (!userName) {
-      return;
+    const {allUsers} = this.props;
+    const inBiztech = allUsers.find((user) => {
+      return user.name == userName || `${user.name}@sogou-inc.com` == userName;
+    });
+    if (!inBiztech) {
+      BizWorkAlert.alert('请输入自己的搜狗邮箱账号');
+      return false;
     }
     this.props.successLogin(userName);
   };
 
   render() {
     return (
-      <Image source={require('./bg1.jpg')} style={styles.backgroundImage} >
+      <ImageBackground source={require('./bg1.jpg')} style={styles.backgroundImage}>
         <View style={styles.container}>
           <View style={styles.logoview}>
             <Image source={require('./logo.png')} style={styles.avatarimage}/>
@@ -42,7 +49,7 @@ export default class FaceScan extends Component {
               iconName={'user'}
               iconColor={'white'}
               iconBackgroundColor={'#108ee9'}
-              inputStyle={{ color: '#464949' }}
+              inputStyle={{color: '#464949'}}
               placeholder='用户名'
               onChangeText={(text) => this.setState({userName: text})}
               value={this.state.userName}
@@ -53,7 +60,7 @@ export default class FaceScan extends Component {
               iconName={'lock'}
               iconColor={'white'}
               iconBackgroundColor={'#108ee9'}
-              inputStyle={{ color: '#464949' }}
+              inputStyle={{color: '#464949'}}
               placeholder='密码'
               value={this.state.passWord}
               onChangeText={(text) => this.setState({passWord: text})}
@@ -61,27 +68,27 @@ export default class FaceScan extends Component {
               secureTextEntry={true}
               style={{height: 60}}
             />
-            {/*<View style={styles.inputview}>*/}
-            {/*<TextInput*/}
-            {/*underlineColorAndroid='transparent'*/}
-            {/*style={styles.textinput}*/}
-            {/*onChangeText={(text) => this.setState({userName: text})}*/}
-            {/*value={this.state.userName}*/}
-            {/*placeholder='用户名'*/}
-            {/*selectionColor='#1DBAF1'*/}
-            {/*/>*/}
-            {/*</View>*/}
-            {/*<View style={styles.inputview}>*/}
-            {/*<TextInput*/}
-            {/*underlineColorAndroid='transparent'*/}
-            {/*style={styles.textinput}*/}
-            {/*onChangeText={(text) => this.setState({passWord: text})}*/}
-            {/*value={this.state.passWord}*/}
-            {/*placeholder='密码'*/}
-            {/*selectionColor='#1DBAF1'*/}
-            {/*secureTextEntry={true}*/}
-            {/*/>*/}
-            {/*</View>*/}
+            {/*<View style={styles.inputview}>
+              <TextInput
+                underlineColorAndroid='transparent'
+                style={styles.textinput}
+                onChangeText={(text) => this.setState({userName: text})}
+                value={this.state.userName}
+                placeholder='用户名'
+                selectionColor='#1DBAF1'
+              />
+            </View>
+            <View style={styles.inputview}>
+              <TextInput
+                underlineColorAndroid='transparent'
+                style={styles.textinput}
+                onChangeText={(text) => this.setState({passWord: text})}
+                value={this.state.passWord}
+                placeholder='密码'
+                selectionColor='#1DBAF1'
+                secureTextEntry={true}
+              />
+            </View>*/}
           </View>
 
           <View style={styles.bottomview}>
@@ -92,26 +99,26 @@ export default class FaceScan extends Component {
             </TouchableOpacity>
           </View>
         </View>
-      </Image>
+      </ImageBackground>
 
     );
   }
 }
 
 const styles = StyleSheet.create({
-  backgroundImage:{
+  backgroundImage: {
     // flex:1,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     flexDirection: 'row',
     // width:null,
     width: Dimensions.get('window').width,
-    height:Dimensions.get('window').height,
+    height: Dimensions.get('window').height,
     //不加这句，就是按照屏幕高度自适应
     //加上这几，就是按照屏幕自适应
     // resizeMode:Image.resizeMode.contain,
     //祛除内部元素的白色背景
-    backgroundColor:'rgba(0,0,0,0)',
+    backgroundColor: 'rgba(0,0,0,0)',
   },
   container: {
     flex: 1,

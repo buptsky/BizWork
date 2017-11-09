@@ -18,7 +18,7 @@ export default class Loading extends Component {
   }
 }
 
-const indicatorColor = '#fa4f00';
+const indicatorColor = '#039be5';
 
 const styles = StyleSheet.create({
   container: {
