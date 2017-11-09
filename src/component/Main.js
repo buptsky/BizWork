@@ -7,7 +7,7 @@ import BizLab from './BizLab/BizLab';
 import FaceScan from  './BizLab/FaceScan';
 
 const Tab = TabNavigator({
-    WorkFlow: {
+    /*WorkFlow: {
       screen: WorkFlow,
       navigationOptions: {
         tabBarLabel: '工作流程',
@@ -19,7 +19,7 @@ const Tab = TabNavigator({
           />
         ),
       }
-    },
+    },*/
     BizLab: {
       screen: BizLab,
       navigationOptions: {
