@@ -65,7 +65,6 @@ export default class FaceScan extends Component {
   }
 
   componentDidMount() {
-    console.log('dddd');
     this.startAnimate  = true;
     this.startAnimation();
   }
@@ -100,11 +99,15 @@ export default class FaceScan extends Component {
   }
   // 扫描成功
   successScan = (userName) => {
+    const allUsers = this.props.screenProps.allUsers;
+    const userInfo = allUsers.find((value, index) => {
+      return value.name === userName;
+    });
     if (!this.state.startScan) return; // 防止意外退出报错
     this.resetAnimation();
     this.setState({
       modalVisible: true,
-      userName: userName ? userName : '',
+      userName: userName ? userInfo.label : '',
       tip: ''
     }, () => {
       this.setState({

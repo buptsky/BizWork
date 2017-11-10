@@ -89,7 +89,7 @@ export default class App extends Component {
       )
     } else {
       if (isLogin) {
-        return <Main screenProps={this.logout}/>
+        return <Main screenProps={{logout: this.logout, allUsers: allUsers}}/>
       } else {
         return <Login successLogin={this.successLogin} allUsers={allUsers}/>
       }

@@ -62,12 +62,13 @@ export default class FaceScan extends Component {
               iconColor={'white'}
               iconBackgroundColor={'#108ee9'}
               inputStyle={{color: '#464949'}}
-              placeholder='密码'
+              placeholder='密码(测试版不需输入)'
               value={this.state.passWord}
               onChangeText={(text) => this.setState({passWord: text})}
               selectionColor='#1DBAF1'
               secureTextEntry={true}
               style={{height: 60}}
+              editable={false} selectTextOnFocus={false}
             />
           </View>
 

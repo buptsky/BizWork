@@ -4,7 +4,8 @@ import {View, Text, StyleSheet, AsyncStorage, Button} from 'react-native';
 export default class Mine extends Component {
   logout = () => {
     AsyncStorage.clear();
-    this.props.screenProps();
+    console.log('log out');
+    this.props.screenProps.logout();
   };
 
   render() {
