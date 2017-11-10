@@ -7,9 +7,6 @@ export default fetchData = (options) => {
       if (!error && token) {
         options.data = {...options.data, id: token};
       }
-      /*if (options.needDefaultServer || options.needDefaultServer === undefined) {
-        options.url = '' + options.url;
-      }*/
       const fetchOption = {
         method: options.method || 'POST',
         headers: {
@@ -19,15 +16,20 @@ export default fetchData = (options) => {
         body: JSON.stringify(options.data)
       };
 
-      fetch(options.url, fetchOption).then(res => res.json()).then((responseJSON) => {
-        //console.log(responseJSON);
-        if (responseJSON.success) {
-          resolve(responseJSON.data);
-        } else {
-          // BizWorkAlert(responseJSON.errorMsg);
-          reject(responseJSON);
-        }
-      });
+      fetch(options.url, fetchOption)
+        .then(res => res.json())
+        .then((responseJSON) => {
+          if (responseJSON.success) {
+            resolve(responseJSON.data);
+          } else {
+            BizWorkAlert.alert(responseJSON.errorMsg);
+            reject(responseJSON);
+          }
+        })
+        .catch((error) => {
+          BizWorkAlert.alert(error);
+          reject(error);
+        });
     });
   });
 };
