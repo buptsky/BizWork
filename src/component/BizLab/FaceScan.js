@@ -13,13 +13,12 @@ import {
   Platform,
   AsyncStorage
 } from 'react-native';
-import {Toast} from 'antd-mobile';
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import fetchData from '../../util/fetchData';
-import Screen from '../../common/screen';
+import BizWorkAlert from '../../common/BizWorkAlert';
 import servers from '../../util/servers';
 
 
@@ -179,7 +178,7 @@ export default class FaceScan extends Component {
         this.takePicture(); // 继续采集信息
       }
     } catch (err) {
-      Toast.info('网络错误，请稍后再试');
+      BizWorkAlert.alert('未知错误，请联系开发人员');
       console.log(err);
     }
   }

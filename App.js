@@ -24,21 +24,12 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    //空接口，提示用户开启数据访问权限
+    fetchData({url: servers.FaceScan + '/tst.do'});
     NetInfo.isConnected.addEventListener(
       'connectionChange',
       this.handleConnectivityChange
     );
-    fetchData({url: servers.BizTaskDev + '/user/getAll.do', data: {}}).then((data) => {
-      console.log(data);
-      allUsers = data;  //不往storage中存是因为数据太大，红屏了
-      //根据token判断登录状态
-      AsyncStorage.getItem('userToken').then((data) => {
-        this.setState({
-          isLoaded: true,
-          isLogin: !!data
-        });
-      });
-    });
   }
 
   componentWillUnmount() {

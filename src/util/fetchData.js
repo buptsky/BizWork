@@ -26,7 +26,7 @@ export default fetchData = (options) => {
           }
         })
         .catch((error) => {
-          BizWorkAlert.alert(error);
+          //BizWorkAlert.alert(error);
           reject(error);
         });
     });
