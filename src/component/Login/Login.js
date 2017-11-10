@@ -69,27 +69,6 @@ export default class FaceScan extends Component {
               secureTextEntry={true}
               style={{height: 60}}
             />
-            {/*<View style={styles.inputview}>
-              <TextInput
-                underlineColorAndroid='transparent'
-                style={styles.textinput}
-                onChangeText={(text) => this.setState({userName: text})}
-                value={this.state.userName}
-                placeholder='用户名'
-                selectionColor='#1DBAF1'
-              />
-            </View>
-            <View style={styles.inputview}>
-              <TextInput
-                underlineColorAndroid='transparent'
-                style={styles.textinput}
-                onChangeText={(text) => this.setState({passWord: text})}
-                value={this.state.passWord}
-                placeholder='密码'
-                selectionColor='#1DBAF1'
-                secureTextEntry={true}
-              />
-            </View>*/}
           </View>
 
           <View style={styles.bottomview}>
@@ -101,7 +80,6 @@ export default class FaceScan extends Component {
           </View>
         </View>
       </ImageBackground>
-
     );
   }
 }

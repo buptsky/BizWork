@@ -75,10 +75,6 @@ export default class FaceScan extends Component {
     // console.log('unmount');
   }
 
-  liveDetection() {
-
-  }
-
   // 点击进行扫描
   startScan = () => {
     console.log('start scan');

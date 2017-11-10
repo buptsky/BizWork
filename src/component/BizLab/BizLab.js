@@ -16,8 +16,6 @@ import servers from '../../util/servers';
 import BizWorkAlert from '../../common/BizWorkAlert';
 
 export default class BizLab extends Component {
-
-
   constructor(props) {
     super(props);
     this.state = {

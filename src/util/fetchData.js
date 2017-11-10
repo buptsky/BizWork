@@ -15,7 +15,6 @@ export default fetchData = (options) => {
         },
         body: JSON.stringify(options.data)
       };
-
       fetch(options.url, fetchOption)
         .then(res => res.json())
         .then((responseJSON) => {

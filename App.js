@@ -18,28 +18,44 @@ export default class App extends Component {
     super(props);
     this.state = {
       isLoaded: false,
-      isLogin: false
+      isLogin: false,
+      infoStr: ''
     };
   }
 
   componentDidMount() {
-    NetInfo.addEventListener('connectionChange', this.handleConnectionInfoChange);
-    //空接口，提示用户开启数据访问权限
-    fetchData({url: servers.FaceScan + '/tst.do'});
+    NetInfo.isConnected.addEventListener(
+      'connectionChange',
+      this.handleConnectivityChange
+    );
+    fetchData({url: servers.BizTaskDev + '/user/getAll.do', data: {}}).then((data) => {
+      console.log(data);
+      allUsers = data;  //不往storage中存是因为数据太大，红屏了
+      //根据token判断登录状态
+      AsyncStorage.getItem('userToken').then((data) => {
+        this.setState({
+          isLoaded: true,
+          isLogin: !!data
+        });
+      });
+    });
   }
 
   componentWillUnmount() {
-    NetInfo.removeEventListener('connectionChange', this.handleConnectionInfoChange);
+    NetInfo.isConnected.removeEventListener(
+      'connectionChange',
+      this.handleConnectivityChange
+    );
   }
 
-  handleConnectionInfoChange = (netInfo) => {
-    if (netInfo === 'none' || netInfo === 'unknown') {
+  handleConnectivityChange = (isConnected) => {
+    if (!isConnected) {
       this.setState({
         infoStr: '网络故障'
-      })
+      });
     } else {
-      //获取所有用户信息,不从AsyncStorage中取是因为userAll信息是经常变动的
       fetchData({url: servers.BizTaskDev + '/user/getAll.do'}).then((data) => {
+        console.log(data);
         allUsers = data;  //不往storage中存是因为数据太大，红屏了
         //根据token判断登录状态
         AsyncStorage.getItem('userToken').then((data) => {
@@ -50,7 +66,8 @@ export default class App extends Component {
         });
       });
     }
-  };
+  }
+
   successLogin = (userName) => {
     try {
       AsyncStorage.setItem('userToken', userName).then(() => {
