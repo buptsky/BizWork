@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import fetchData from '../../util/fetchData';
 import Screen from '../../common/screen';
+import servers from '../../util/servers';
 
 
 export default class FaceScan extends Component {
@@ -151,7 +152,7 @@ export default class FaceScan extends Component {
         '/verifyFace.do' :
         '/addFace.do';
       const res = await fetchData({ // 发送数据请求
-        url: url, data: {data: encodeURIComponent(base64)}
+        url: servers.FaceScan + url, data: {data: encodeURIComponent(base64)}
       });
       if (this.state.status === 'scan' && res.status) { // 采集
         this.successNum++;
