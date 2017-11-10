@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 import {
   StyleSheet,
   View,
-  Animated,
   Text,
-  Button,
   TouchableWithoutFeedback,
   Platform,
   ActivityIndicator,
@@ -15,12 +13,11 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import fetchData from '../../util/fetchData';
 import servers from '../../util/servers';
+import BizWorkAlert from '../../common/BizWorkAlert';
+
 export default class BizLab extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {state, setParams} = navigation;
-  };
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -31,32 +28,25 @@ export default class BizLab extends Component {
   // 判断是否采集过数据
   async componentWillMount() {
     try {
-      const res =  await fetchData({
+      const res = await fetchData({
         url: servers.FaceScan + '/queryUser.do',
         data: {}
       });
       if (res.status) {
         await AsyncStorage.setItem('status', 'login');
-        console.log('isCollect');
       } else {
         await AsyncStorage.setItem('status', 'scan');
       }
       this.setState({
         loading: false
       });
-    } catch(err) {
-      console.log(err);
+    } catch (err) {
+      BizWorkAlert.alert(err);
     }
   }
 
-  componentWillUnmount() {
-    console.log('unmount');
-  }
-  
   render() {
-    console.log(this.props.navigation.state.params);;
     const {navigate} = this.props.navigation;
-    console.log(navigate);
     return (
       <View style={styles.labContainer}>
         {

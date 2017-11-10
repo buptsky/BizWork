@@ -39,8 +39,7 @@ export default class App extends Component {
       })
     } else {
       //获取所有用户信息,不从AsyncStorage中取是因为userAll信息是经常变动的
-      //fetchData({url: servers.BizTaskDev + '/user/getAll.do'}).then((data) => {
-      fetchData({url: servers.XuQiang + '/user/getAll.do'}).then((data) => {
+      fetchData({url: servers.BizTaskDev + '/user/getAll.do'}).then((data) => {
         allUsers = data;  //不往storage中存是因为数据太大，红屏了
         //根据token判断登录状态
         AsyncStorage.getItem('userToken').then((data) => {

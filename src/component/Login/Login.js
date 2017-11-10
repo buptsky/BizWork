@@ -24,12 +24,13 @@ export default class FaceScan extends Component {
   }
 
   confirmLogin = () => {
-    const {userName, passWord} = this.state;
+    let {userName, passWord} = this.state;
     const {allUsers} = this.props;
-    const inBiztech = allUsers.find((user) => {
+    userName = userName.toLowerCase();
+    const loginUser = allUsers.find((user) => {
       return user.name == userName || `${user.name}@sogou-inc.com` == userName;
     });
-    if (!inBiztech) {
+    if (!loginUser) {
       BizWorkAlert.alert('请输入自己的搜狗邮箱账号');
       return false;
     }
